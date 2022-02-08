@@ -1,9 +1,23 @@
 const express = require('express')
+const bodyParser = require('body-parser')
+const port = 3000;
 const app = express()
-const port = 3000
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
+const db = require('better-sqlite3')('./db.db');
+
+app.get('/students', (req, res) => {
+    const GET = db.prepare('SELECT * FROM Students').all();
+    res.send(GET)
+})
+
+app.post('/students', (req, res) => {
+    const POST = db.prepare('INSERT INTO Students VALUES (?, ?, ?)');
+    POST.run(req.body.id, req.body.name, req.body.phone);
+    res.send('Sendt')
 })
 
 app.listen(port, () => {
